@@ -10,6 +10,9 @@ export type Product = {
   id: number;
   store: string;
   name: string;
+
+  aliases: string[];   // ← ここを追加
+
   rating: number;
   reviews: number;
   category: string;

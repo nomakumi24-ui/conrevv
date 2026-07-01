@@ -1,28 +1,54 @@
-import Link from "next/link";
 import { Header } from "@/components/Header";
-import { ProposalCard } from "@/components/ProposalCard";
-import { proposals } from "@/data/proposals";
+import { ProductCard } from "@/components/ProductCard";
+import { prisma } from "@/lib/prisma";
 
-export default function AdminProposalsPage() {
+export default async function Home() {
+  const products = await prisma.product.findMany({
+    include: {
+      aliases: true,
+      reviews: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
   return (
     <main className="min-h-screen bg-gray-100">
       <Header />
 
-      <section className="mx-auto max-w-5xl p-6">
-        <Link href="/" className="text-emerald-700 hover:underline">
-          ← トップへ戻る
-        </Link>
+      <section className="mx-auto max-w-6xl p-6">
+        <input
+          type="text"
+          placeholder="商品名で検索..."
+          className="mb-8 w-full rounded-lg border p-3"
+        />
 
-        <div className="mt-6">
-          <h1 className="text-3xl font-bold">編集提案の承認</h1>
-          <p className="mt-2 text-gray-600">
-            ユーザーから届いた商品情報の修正提案を確認します。
-          </p>
-        </div>
+        <h2 className="mb-5 text-2xl font-bold">🔥人気の商品</h2>
 
-        <div className="mt-6 grid gap-4">
-          {proposals.map((proposal) => (
-            <ProposalCard key={proposal.id} proposal={proposal} />
+        <div className="grid gap-5">
+          {products.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={{
+                id: product.id,
+                store: product.store,
+                name: product.name,
+                aliases: product.aliases.map((alias) => alias.keyword),
+                rating:
+                  product.reviews.length === 0
+                    ? 0
+                    : product.reviews.reduce((sum, review) => sum + review.rating, 0) /
+                      product.reviews.length,
+                reviews: product.reviews.length,
+                category: product.category,
+                active: product.active,
+                price: product.price ?? 0,
+                description: product.description ?? "",
+                imageUrl: product.imageUrl ?? undefined,
+                reviewList: [],
+              }}
+            />
           ))}
         </div>
       </section>

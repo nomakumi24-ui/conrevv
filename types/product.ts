@@ -7,7 +7,7 @@ export type Review = {
 };
 
 export type Product = {
-  id: number;
+  id: string;
   store: string;
   name: string;
 

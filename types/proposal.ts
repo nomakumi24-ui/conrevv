@@ -1,7 +1,7 @@
 export type ProposalStatus = "PENDING" | "APPROVED" | "REJECTED";
 
 export type Proposal = {
-  id: number;
+  id: string;
   type: string;
   productName: string;
   newValue: string;

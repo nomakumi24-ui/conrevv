@@ -1,7 +1,14 @@
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { Header } from "@/components/Header";
 import { prisma } from "@/lib/prisma";
+
+type AdminProposalsPageProps = {
+  searchParams: Promise<{
+    secret?: string;
+  }>;
+};
 
 async function approveProposal(formData: FormData) {
   "use server";
@@ -69,7 +76,15 @@ async function rejectProposal(formData: FormData) {
   revalidatePath("/admin/proposals");
 }
 
-export default async function AdminProposalsPage() {
+export default async function AdminProposalsPage({
+  searchParams,
+}: AdminProposalsPageProps) {
+  const { secret } = await searchParams;
+
+  if (secret !== process.env.ADMIN_SECRET) {
+    redirect("/");
+  }
+
   const proposals = await prisma.proposal.findMany({
     include: {
       product: true,

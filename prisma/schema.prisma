@@ -28,65 +28,65 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  aliases     ProductAlias[]
-  versions    ProductVersion[]
-  reviews     Review[]
-  proposals   Proposal[]
+  aliases   ProductAlias[]
+  versions  ProductVersion[]
+  reviews   Review[]
+  proposals Proposal[]
 }
 
 model ProductAlias {
-  id        String  @id @default(cuid())
+  id        String @id @default(cuid())
   keyword   String
   productId String
 
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([keyword])
 }
 
 model ProductVersion {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   version     Int
   name        String
   description String?
   price       Int?
   releasedAt  DateTime?
   productId   String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 
-  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([productId, version])
 }
 
 model Review {
-  id          String   @id @default(cuid())
-  rating      Int
-  comment     String
-  buyAgain    Boolean
-  imageUrl    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String
+  buyAgain  Boolean
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  userId      String
-  productId   String
+  userId    String
+  productId String
 
-  user        User    @relation(fields: [userId], references: [id])
-  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([productId])
 }
 
 model Proposal {
-  id          String   @id @default(cuid())
-  type        String
-  oldValue    String?
-  newValue    String?
-  reason      String
-  status      String   @default("PENDING")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  type      String
+  oldValue  String?
+  newValue  String?
+  reason    String
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  productId   String
-  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
 }

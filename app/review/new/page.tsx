@@ -1,8 +1,65 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Header } from "@/components/Header";
-import { products } from "@/data/products";
+import { prisma } from "@/lib/prisma";
 
-export default function NewReviewPage() {
+type NewReviewPageProps = {
+  searchParams: Promise<{
+    productId?: string;
+  }>;
+};
+
+async function createReview(formData: FormData) {
+  "use server";
+
+  const productId = String(formData.get("productId"));
+  const rating = Number(formData.get("rating"));
+  const comment = String(formData.get("comment"));
+  const buyAgain = formData.get("buyAgain") === "true";
+
+  if (!productId || !rating || !comment) {
+    throw new Error("入力内容が不足しています。");
+  }
+
+  let user = await prisma.user.findFirst({
+    where: {
+      email: "guest@example.com",
+    },
+  });
+
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        name: "ゲストユーザー",
+        email: "guest@example.com",
+      },
+    });
+  }
+
+  await prisma.review.create({
+    data: {
+      productId,
+      userId: user.id,
+      rating,
+      comment,
+      buyAgain,
+    },
+  });
+
+  redirect(`/product/${productId}`);
+}
+
+export default async function NewReviewPage({
+  searchParams,
+}: NewReviewPageProps) {
+  const { productId } = await searchParams;
+
+  const products = await prisma.product.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
   return (
     <main className="min-h-screen bg-gray-100">
       <Header />
@@ -18,10 +75,14 @@ export default function NewReviewPage() {
             食べた商品の感想を投稿できます。
           </p>
 
-          <form className="mt-6 grid gap-5">
+          <form action={createReview} className="mt-6 grid gap-5">
             <div>
               <label className="font-bold">商品</label>
-              <select className="mt-2 w-full rounded-lg border p-3">
+              <select
+                name="productId"
+                defaultValue={productId}
+                className="mt-2 w-full rounded-lg border p-3"
+              >
                 {products.map((product) => (
                   <option key={product.id} value={product.id}>
                     {product.store} / {product.name}
@@ -32,7 +93,7 @@ export default function NewReviewPage() {
 
             <div>
               <label className="font-bold">評価</label>
-              <select className="mt-2 w-full rounded-lg border p-3">
+              <select name="rating" className="mt-2 w-full rounded-lg border p-3">
                 <option value="5">★★★★★ 5</option>
                 <option value="4">★★★★☆ 4</option>
                 <option value="3">★★★☆☆ 3</option>
@@ -44,6 +105,8 @@ export default function NewReviewPage() {
             <div>
               <label className="font-bold">コメント</label>
               <textarea
+                name="comment"
+                required
                 placeholder="例：味が濃くてご飯が進む。また買いたい。"
                 className="mt-2 min-h-32 w-full rounded-lg border p-3"
               />
@@ -51,14 +114,17 @@ export default function NewReviewPage() {
 
             <div>
               <label className="font-bold">また買う？</label>
-              <select className="mt-2 w-full rounded-lg border p-3">
+              <select
+                name="buyAgain"
+                className="mt-2 w-full rounded-lg border p-3"
+              >
                 <option value="true">はい</option>
                 <option value="false">いいえ</option>
               </select>
             </div>
 
             <button
-              type="button"
+              type="submit"
               className="rounded-lg bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700"
             >
               レビューを投稿

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Product } from "@/types/product";
 
 type ProductCardProps = {
@@ -17,17 +18,24 @@ export function ProductCard({ product }: ProductCardProps) {
 
       <h3 className="mt-2 text-2xl font-bold">{product.name}</h3>
 
+      <p className="mt-2 text-gray-600">{product.description}</p>
+
       <p className="mt-3 text-lg">⭐ {product.rating}</p>
 
       <p className="text-gray-500">{product.reviews}件のレビュー</p>
+
+      <p className="mt-2 font-bold">{product.price}円</p>
 
       <p className="mt-2 text-sm">
         {product.active ? "販売中" : "販売終了"}
       </p>
 
-      <button className="mt-4 rounded-lg bg-emerald-600 px-5 py-2 text-white hover:bg-emerald-700">
+      <Link
+        href={`/product/${product.id}`}
+        className="mt-4 inline-block rounded-lg bg-emerald-600 px-5 py-2 text-white hover:bg-emerald-700"
+      >
         レビューを見る
-      </button>
+      </Link>
     </div>
   );
 }

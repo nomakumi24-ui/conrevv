@@ -65,9 +65,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <div className="mt-8 flex items-center justify-between gap-3">
           <h2 className="text-2xl font-bold">レビュー</h2>
 
-          <button className="rounded-lg bg-emerald-600 px-5 py-2 text-white hover:bg-emerald-700">
-            レビューを書く
-          </button>
+          <Link
+  href="/review/new"
+  className="rounded-lg bg-emerald-600 px-5 py-2 text-white hover:bg-emerald-700"
+>
+  レビューを書く
+</Link>
         </div>
 
         <div className="mt-5 grid gap-4">
